@@ -11,7 +11,7 @@
 from py2neo import Graph,Node,Relationship,NodeSelector
 
 # 建立數據庫連接
-graph=Graph("http://localhost:7474/db/dat",user="neo4j",password="cgh2332524")
+graph=Graph("http://localhost:7474/db/dat",user="neo4j",password="password")
 con=graph.begin()
 
 
