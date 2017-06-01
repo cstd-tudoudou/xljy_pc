@@ -8,14 +8,16 @@
 # 完成狀態：未完成
 
 # 導入數據庫包文件（在此使用py2neo作爲連接包）
-from py2neo import Graph,Node,Relationship,NodeSelector
+from py2neo import Graph,Node,Relationship
 
 # 建立數據庫連接
-graph=Graph("http://localhost:7474/db/dat",user="neo4j",password="password")
+f = str(open('config', 'rt').read())
+f=eval(f)
+graph = Graph("http://localhost:7474/db/data", user=f['user'], password=f['password'])
 con=graph.begin()
 
 
-# 插入節點數據並連接函數
+# 插入節點數據並連接函數  A -> B
 def insert_connect_data(Type="People",A=["name","data-username","nickname","fan_num","png"],B=["name","data-username","nickname","fan_num","png"],relation=":KNOW"):
     try:
         if not A[1]=="data-username" or B[1]=="data-username":
@@ -37,7 +39,6 @@ def insert_connect_data(Type="People",A=["name","data-username","nickname","fan_
             )
             create_node(a)
             create_node(b)
-            print(str(type(a))+"insert_connect_data")
             create_connection(a,b,relation)
         else:
             print("節點名稱異常錯誤")
@@ -65,7 +66,7 @@ def find_node(Type,key,value):
 
 
 
-# 建立節點關系
+# 建立節點關系 A->b
 def create_connection(a,b,relation):
     try:
         con=graph.begin()
@@ -86,7 +87,7 @@ def create_node(node):
 
 
 
-# 查找節點並連接
+# 查找節點並連接  b -> a
 def connect(a=["Type","key","value"],Type="People",B=[],relation=":KNOW"):
     try:
         b = Node(
@@ -106,11 +107,41 @@ def connect(a=["Type","key","value"],Type="People",B=[],relation=":KNOW"):
     except:
         print("查找節點並連接模塊異常")
 
+def create_nodeonly(Type,A):
+    A = Node(
+        Type,
+        name=A[0],
+        data_username=A[1],
+        nickname=A[2],
+        fan_num=A[3],
+        picture=A[4]
+    )
+    create_node(A)
 
 
 
 
 
+# def buildNodes(nodeRecord):
+#     data = {"id": str(nodeRecord.n._id), "label": next(iter(nodeRecord.n.labels))}
+#     data.update(nodeRecord.n.properties)
+#
+#     return {"data": data}
+#
+# def buildEdges(relationRecord):
+#     data = {"source": str(relationRecord.r.start_node._id),
+#             "target": str(relationRecord.r.end_node._id),
+#             "relationship": relationRecord.r.rel.type}
+#
+#     return {"data": data}
+#
+# def get_graph():
+#     # nodes = map(buildNodes, graph.cypher.execute('MATCH (n) RETURN n'))
+#     # edges = map(buildEdges, graph.cypher.execute('MATCH ()-[r]->() RETURN r'))
+#     nodes = map(buildNodes, graph.data('MATCH (n) RETURN n'))
+#     edges = map(buildEdges, graph.data('MATCH ()-[r]->() RETURN r'))
+#
+#     return jsonify(elements={"nodes": nodes, "edges": edges})
 
 
 
@@ -141,3 +172,5 @@ def connect(a=["Type","key","value"],Type="People",B=[],relation=":KNOW"):
     # database.insert_connect_data("People",["nane_1","data_name","nickname_1","fan_num_1","pngmap"],["nane_2","data_name_2","nickname_2","fan_num_2","pngmap_2"],":KNOW")
     # database.connect(["People","fan_num","fan_num_2"],"People",["nane_3","data_name3","nickname_3","fan_num_3","pngmap3"],":KNOW1")
     # database.find_node("People","fan_num","fan_num_1")
+    # js=get_graph()
+    # print(js)
