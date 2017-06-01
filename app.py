@@ -7,13 +7,14 @@
 # github：https://github.com/cstd-tudoudou
 # 完成狀態：未完成
 
-import get_db
-import database
+import os
 from flask import Flask, jsonify, render_template
 
 app = Flask(__name__)
 
 def run():
+    import get_db
+    import database
     database.create_nodeonly('People', ["陶卓", 'taozhuo', "陶卓", '233', '未知'])  # 先建立一個陶老師的節點
     # start_user = "taozhuo"  # 起始用戶網址 陶老師的粉絲實在太多了，所以就從陶老師下手了，【壞笑】
     num = 0;
@@ -47,11 +48,26 @@ def index():
 
 # 運行主函數
 if __name__=="__main__":
-
-    # run()
+    if not os.path.isfile('config'):
+        import init
+        init.init()
+        print("即將開始資料初始化，請稍等")
+        run()
+    print("初始化完成")
+    key=input("""
+1. 更新資料庫(這將可能會刪除您的所有資料)
+2. 運行Web查看
+請選擇任務：""")
+    if key=="2":
+        app.config['JSON_AS_ASCII'] = False
+        app.run(debug=True)
+    elif key=="1":
+        import api
+        api.delete()
+    else:
+        print("請確認輸入序號")
     # app.config['JSON_AS_UTF'] = False
-    app.config['JSON_AS_ASCII']=False
-    app.run(debug=True)
+
     # database.insert_connect_data("People",data[0],["陶卓",'taozhuo',"陶卓",'233','未知'],":KNOW")
     # print(len(page_username))
     # for a in range(2,233):
